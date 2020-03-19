@@ -10,18 +10,6 @@
 
 static char child_stack[1048576];
 
-/*
- * Checklist
- * 
- * [x] Network
- * [x] Pid (namespaces)
- * [x] FS Save
- * [ ] Cgroups
- * [ ] Benchmarks
- */
-
-// sudo apt install net-tools
-// sudo apt install sysbench
 
 static int child_fn(void* arg) {
     // root config

@@ -15,6 +15,19 @@
 #include <sstream>
 #include <algorithm>
 
+/*
+ * Checklist
+ * 
+ * [x] network
+ * [x] pid (namespaces)
+ * [x] fs save
+ * [ ] cgroups
+ * [ ] benchmarks
+ */
+
+// sudo apt install net-tools
+// sudo apt install sysbench
+
 static char child_stack[1048576];
 
 // call shell command and return it's output
@@ -89,6 +102,9 @@ static int child_fn(void* arg) {
     std::cout << "File In container: " << std::flush;
     system(concat("sudo -S cat ", mount_folder, "/hello.txt").c_str());
 
+
+    system("sysbench --test=cpu --cpu-max-prime=20000 run");
+
     //system("mount -t proc proc /proc --make-private");
     printf("New `net` Namespace:\n");
     system("ip link");
@@ -98,7 +114,7 @@ static int child_fn(void* arg) {
     // cleanup
     clean_fs_save(loop_device, mount_folder);
     // should produce file not found error:
-    std::cout<< "File Out of container: " << std::flush;
+    std::cout<< "File Outside container (should be error): " << std::flush;
     system(concat("sudo -S cat ", mount_folder, "/hello.txt").c_str());
     
     system("sudo -S umount /proc"); return 0;
@@ -107,9 +123,13 @@ static int child_fn(void* arg) {
 int main() {
     printf("Original `net` Namespace:\n");
     system("ip link");
+    //system("ps aux");
     printf("\n\n");
     
-    pid_t child_pid = clone(child_fn, child_stack+1048576, CLONE_NEWPID| CLONE_NEWNET | SIGCHLD, NULL);
+    pid_t child_pid = clone(child_fn, child_stack+1048576, CLONE_NEWNS | CLONE_NEWPID| CLONE_NEWNET | SIGCHLD, NULL);
+    system(concat("ip link add name veth0 type veth peer name veth1 netns ", child_pid).c_str());
+    system("ifconfig veth0 10.1.1.1/24 up");
+
     waitpid(child_pid, NULL, 0);
     _exit(EXIT_SUCCESS);
 }
