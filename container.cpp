@@ -25,6 +25,7 @@
  * [ ] benchmarks
  */
 
+// sudo apt update
 // sudo apt install net-tools
 // sudo apt install sysbench
 
@@ -85,6 +86,22 @@ void clean_fs_save(std::string free_loop, std::string mount_folder, std::string 
     system(concat("sudo losetup -d ", free_loop).c_str());
 }
 
+void benchmark()
+{
+    system("sysbench --test=cpu --cpu-max-prime=20000 run");
+    
+    // mode seqwr, seqrd, rndwr, rndrd
+    // system("sysbench fileio --file-total-size=15G --file-test-mode=rndrw --time=300 --max-requests=0 prepare");
+    // system("sysbench fileio --file-total-size=15G --file-test-mode=rndrw --time=300 --max-requests=0 run");
+    // system("sysbench fileio --file-total-size=15G --file-test-mode=rndrw --time=300 --max-requests=0 cleanup");
+
+    // system("sysbench memory --memory-block-size=1M --memory-total-size=10G run");
+    // system("sysbench memory --memory-block-size=1K --memory-total-size=8G run");
+
+    // system("sysbench threads --threads=128 run");
+
+}
+
 static int child_fn(void* arg) {
     // root config
     unshare(CLONE_NEWNET);
@@ -102,8 +119,7 @@ static int child_fn(void* arg) {
     std::cout << "File In container: " << std::flush;
     system(concat("sudo -S cat ", mount_folder, "/hello.txt").c_str());
 
-
-    system("sysbench --test=cpu --cpu-max-prime=20000 run");
+    benchmark();
 
     //system("mount -t proc proc /proc --make-private");
     printf("New `net` Namespace:\n");
