@@ -33,6 +33,8 @@ sudo ./container
 
 > You can view demo output [here](./console_output_container.md)
 
+> Also there is [lab report document](./MSurkov_L1_ContainerReport.pdf)
+
 ### Benchmarking (Used Arch Linux 5.5.10-arch1-1)
 
 **LXC Config**
@@ -56,8 +58,8 @@ $ sudo systemctl enable docker.service
 $ sudo systemctl start docker.service
 $ sudo docker info
 $ sudo docker run -it archlinux:latest /bin/bash
-$$ pacman -Sy
-$$ pacman -S sysbench
+$$ pacman -Sy sysbench
+$$ exit
 
 ```
 
